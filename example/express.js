@@ -6,12 +6,13 @@ import * as url from 'node:url';
 import { dirname } from 'desm';
 import express from 'express'; // eslint-disable-line import/no-unresolved
 import helmet from 'helmet';
+import { Liquid } from 'liquidjs';
 
 import Provider from '../lib/index.js'; // from 'oidc-provider';
-
 import Account from './support/account.js';
 import configuration from './support/configuration.js';
 import routes from './routes/express.js';
+import custom from './routes/custom.js';
 
 const __dirname = dirname(import.meta.url);
 
@@ -20,6 +21,18 @@ configuration.findAccount = Account.findAccount;
 
 const app = express();
 
+// Initialize Liquid engine
+const liquidEngine = new Liquid({
+  root: path.join(__dirname, 'views'), // Set views folder
+  extname: '.liquid', // Use .liquid as file extension for templates
+});
+
+// Use Liquid as the template engine
+app.engine('liquid', liquidEngine.express()); 
+app.set('views', path.join(__dirname, 'views')); // Set the views directory
+app.set('view engine', 'liquid'); // Set Liquid as the view engine
+
+// Configure Helmet with content security policy
 const directives = helmet.contentSecurityPolicy.getDefaultDirectives();
 delete directives['form-action'];
 app.use(helmet({
@@ -28,9 +41,6 @@ app.use(helmet({
     directives,
   },
 }));
-
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
 
 let server;
 try {
@@ -65,9 +75,13 @@ try {
       }
     });
   }
-
+  
+  // Use custom routes
+  custom(app, provider, liquidEngine);
   routes(app, provider);
   app.use(provider.callback());
+
+  // Start the server
   server = app.listen(PORT, () => {
     console.log(`application is listening on port ${PORT}, check its /.well-known/openid-configuration`);
   });

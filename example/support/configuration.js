@@ -1,11 +1,11 @@
 export default {
   clients: [
-    // {
-    //   client_id: 'oidcCLIENT',
-    //   client_secret: '...',
-    //   grant_types: ['refresh_token', 'authorization_code'],
-    //   redirect_uris: ['http://sso-client.dev/providers/7/open_id', 'http://sso-client.dev/providers/8/open_id'],
-    // }
+    {
+      client_id: 'test',
+      client_secret: 'test',
+      grant_types: ['refresh_token', 'authorization_code'],
+      redirect_uris: ['http://sso-client.dev/providers/7/open_id', 'http://sso-client.dev/providers/8/open_id'],
+    }
   ],
   interactions: {
     url(ctx, interaction) { // eslint-disable-line no-unused-vars
