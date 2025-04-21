@@ -14,11 +14,10 @@ jobs:
     steps:
       - name: repository-dispatch-app token
         id: repository-dispatch-app
-        uses: getsentry/action-github-app-token@v3.1
+        uses: actions/create-github-app-token@v1
         with:
-          app_id: ${{ secrets.REPOSITORY_DISPATCH_APP_ID }}
-          private_key: ${{ secrets.REPOSITORY_DISPATCH_APP_PRIVATE_KEY }}
-
+          app-id: ${{ vars.REPOSITORY_DISPATCH_APP_ID }}
+          private-key: ${{ secrets.REPOSITORY_DISPATCH_APP_PRIVATE_KEY }}
       - name: Extract branch name
         shell: bash
         run: echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
