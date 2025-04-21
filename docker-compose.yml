@@ -1,0 +1,12 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    # 環境変数
+#    environment:
+#      - N8N_LOG_LEVEL=debug
+#      - NODE_FUNCTION_ALLOW_EXTERNAL=*
+    tty: true

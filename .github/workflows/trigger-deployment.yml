@@ -3,10 +3,10 @@ name: Trigger Deployment Workflows
 on:
   push:
     branches:
-      - dev
-      - edge
-      - main
-      - prod
+      - login3-edge
+      - login3-dev
+      - login3-stg
+      - login3
 
 jobs:
   trigger-deployment:
@@ -24,12 +24,20 @@ jobs:
         run: echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
 
       - name: Map main branch to prod for dispatch
-        if: env.BRANCH_NAME == 'main'
+        if: env.BRANCH_NAME == 'login3'
         run: echo "DISPATCH_TYPE=node-oidc-provider-prod-push" >> $GITHUB_ENV
 
       - name: Set dispatch type for other branches
-        if: env.BRANCH_NAME != 'main'
-        run: echo "DISPATCH_TYPE=node-oidc-provider-${{ env.BRANCH_NAME }}-push" >> $GITHUB_ENV
+        if: env.BRANCH_NAME != 'login3-edge'
+        run: echo "DISPATCH_TYPE=node-oidc-provider-edge-push" >> $GITHUB_ENV
+
+      - name: Set dispatch type for other branches
+        if: env.BRANCH_NAME != 'login3-dev'
+        run: echo "DISPATCH_TYPE=node-oidc-provider-dev-push" >> $GITHUB_ENV
+
+      - name: Set dispatch type for other branches
+        if: env.BRANCH_NAME != 'login3-stg'
+        run: echo "DISPATCH_TYPE=node-oidc-provider-stg-push" >> $GITHUB_ENV
 
       - name: Trigger repository dispatch event
         uses: peter-evans/repository-dispatch@v2
