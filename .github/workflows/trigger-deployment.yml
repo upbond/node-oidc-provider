@@ -28,15 +28,15 @@ jobs:
         run: echo "DISPATCH_TYPE=node-oidc-provider-prod-push" >> $GITHUB_ENV
 
       - name: Set dispatch type for other branches
-        if: env.BRANCH_NAME != 'login3-edge'
+        if: env.BRANCH_NAME == 'login3-edge'
         run: echo "DISPATCH_TYPE=node-oidc-provider-edge-push" >> $GITHUB_ENV
 
       - name: Set dispatch type for other branches
-        if: env.BRANCH_NAME != 'login3-dev'
+        if: env.BRANCH_NAME == 'login3-dev'
         run: echo "DISPATCH_TYPE=node-oidc-provider-dev-push" >> $GITHUB_ENV
 
       - name: Set dispatch type for other branches
-        if: env.BRANCH_NAME != 'login3-stg'
+        if: env.BRANCH_NAME == 'login3-stg'
         run: echo "DISPATCH_TYPE=node-oidc-provider-stg-push" >> $GITHUB_ENV
 
       - name: Trigger repository dispatch event
