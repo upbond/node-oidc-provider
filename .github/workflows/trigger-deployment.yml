@@ -1,0 +1,40 @@
+name: Trigger Deployment Workflows
+
+on:
+  push:
+    branches:
+      - dev
+      - edge
+      - main
+      - prod
+
+jobs:
+  trigger-deployment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: repository-dispatch-app token
+        id: repository-dispatch-app
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.REPOSITORY_DISPATCH_APP_ID }}
+          private-key: ${{ secrets.REPOSITORY_DISPATCH_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+      - name: Extract branch name
+        shell: bash
+        run: echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
+
+      - name: Map main branch to prod for dispatch
+        if: env.BRANCH_NAME == 'main'
+        run: echo "DISPATCH_TYPE=node-oidc-provider-prod-push" >> $GITHUB_ENV
+
+      - name: Set dispatch type for other branches
+        if: env.BRANCH_NAME != 'main'
+        run: echo "DISPATCH_TYPE=node-oidc-provider-${{ env.BRANCH_NAME }}-push" >> $GITHUB_ENV
+
+      - name: Trigger repository dispatch event
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ steps.repository-dispatch-app.outputs.token }}
+          repository: upbond/upbond-login-cicd
+          event-type: ${{ env.DISPATCH_TYPE }}
+          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "repository": "${{ github.repository }}"}'
